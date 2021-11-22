@@ -6,6 +6,7 @@
 #include <WinSock2.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <SDL.h>
 
 #define SERVERPORT 9152
 #define BUFSIZE    4096
@@ -18,6 +19,51 @@ void init() {
 
 void exit() {
 
+}
+
+bool checkCollision(SDL_Rect a, SDL_Rect b)
+{
+    //The sides of the rectangles
+    int leftA, leftB;
+    int rightA, rightB;
+    int topA, topB;
+    int bottomA, bottomB;
+
+    //Calculate the sides of rect A
+    leftA = a.x;
+    rightA = a.x + a.w;
+    topA = a.y;
+    bottomA = a.y + a.h;
+
+    //Calculate the sides of rect B
+    leftB = b.x;
+    rightB = b.x + b.w;
+    topB = b.y;
+    bottomB = b.y + b.h;
+
+    //If any of the sides from A are outside of B
+    if (bottomA <= topB)
+    {
+        return false;
+    }
+
+    if (topA >= bottomB)
+    {
+        return false;
+    }
+
+    if (rightA <= leftB)
+    {
+        return false;
+    }
+
+    if (leftA >= rightB)
+    {
+        return false;
+    }
+
+    //If none of the sides from A are outside B
+    return true;
 }
 
 // 소켓 함수 오류 출력 후 종료
@@ -79,6 +125,10 @@ DWORD WINAPI WorkerThread(LPVOID arg)
 
     //handle logic
 
+
+    //send data to communicate thread
+    
+    
     //signal
 
 
