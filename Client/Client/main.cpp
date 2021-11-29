@@ -1,5 +1,16 @@
+#define _WINSOCK_DEPRECATED_NO_WARNINGS // 최신 VC++ 컴파일 시 경고 방지
+#define _CRT_SECURE_NO_WARNINGS
+#pragma comment(lib, "ws2_32")
 #include "global.h"
 #include "client.h"
+#include <WinSock2.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+#define SERVERIP   "127.0.0.1"
+#define SERVERPORT 9152
+#define BUFSIZE    512
+
 using namespace std;
 
 SDL_Window* gWindow = NULL;
@@ -40,8 +51,51 @@ void close()
 	SDL_Quit();
 }
 
+// 사용자 정의 데이터 수신 함수
+int recvn(SOCKET s, char* buf, int len, int flags)
+{
+	int received;
+	char* ptr = buf;
+	int left = len;
+
+	while (left > 0) {
+		received = recv(s, ptr, left, flags);
+		if (received == SOCKET_ERROR)
+			return SOCKET_ERROR;
+		else if (received == 0)
+			break;
+		left -= received;
+		ptr += received;
+	}
+
+	return (len - left);
+}
+
+
 int main(int argc, char* args[])
 {
+	int retval;
+
+	WSADATA wsa;
+	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
+		return -1;
+
+	SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
+
+	// connect()
+	SOCKADDR_IN serveraddr;
+	ZeroMemory(&serveraddr, sizeof(serveraddr));
+	serveraddr.sin_family = AF_INET;
+	serveraddr.sin_addr.s_addr = inet_addr(SERVERIP);
+	serveraddr.sin_port = htons(SERVERPORT);
+	retval = connect(sock, (SOCKADDR*)&serveraddr, sizeof(serveraddr));
+	printf("connect success");
+
+	// 데이터 통신에 사용할 변수
+	char buf[BUFSIZE + 1];
+	int len;
+
+	int key = 0;
 	//Start up SDL and create window
 	if (!init()) cout << "Failed to load media!\n";
 	else
@@ -65,22 +119,39 @@ int main(int argc, char* args[])
 					switch (e.key.keysym.sym)
 					{
 					case SDLK_UP:
+						printf("player up \n");
+						key = 1;
 						break;
 
 					case SDLK_DOWN:
+						printf("player down \n");
+						key = 2;
 						break;
 
 					case SDLK_RIGHT:
+						printf("player right \n");
+						key = 3;
 						break;
 
 					case SDLK_LEFT:
+						printf("player left \n");
+						key = 4;
 						break;
 					case SDLK_SPACE:
+						printf("player shoot \n");
+						key = 5;
 						break;
 					}
 				}
+				buf[0] = key;
+
+				retval = send(sock, buf, strlen(buf), 0);
+				break;
 			}
 
+			retval = recvn(sock, buf, retval, 0);
+			if (retval != SOCKET_ERROR)
+				printf("works fine \n");
 			////Apply the image
 			//SDL_BlitSurface(gXOut, NULL, gScreenSurface, NULL);
 			
@@ -89,6 +160,9 @@ int main(int argc, char* args[])
 		}
 	}
 
+
+	closesocket(sock);
+	WSACleanup();
 	close();
 	return 0;
 }

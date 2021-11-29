@@ -1,0 +1,3 @@
+﻿  main.cpp
+C:\Users\User\Documents\KPU Docs\4학년\네트워크게임프로그래밍\Server\Server\main.cpp(80,10): warning C4101: 'ch' :참조되지 않은 지역 변수입니다.
+  Server.vcxproj -> C:\Users\User\Documents\KPU Docs\4학년\네트워크게임프로그래밍\Server\Debug\Server.exe

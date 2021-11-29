@@ -12,3 +12,9 @@ int Tank::setHP()
 {
 	return HP;
 }
+
+void Tank::Fire(int opt)
+{
+	Bullet b;
+	b.move(opt);
+}

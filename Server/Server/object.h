@@ -22,6 +22,7 @@ public:
 	int getHeight();
 	int getDir();
 	SDL_Rect mCollider; //collison box of object mCollider.w = width; mCollider.h = height; on creation
+	void setCollider();
 };
 
 #endif

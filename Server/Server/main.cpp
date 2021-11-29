@@ -2,14 +2,16 @@
 #define _CRT_SECURE_NO_WARNINGS
 #pragma comment(lib, "ws2_32")
 #include "global.h"
-#include "server.h"
+//#include "server.h"
 #include <WinSock2.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <SDL.h>
 
 #define SERVERPORT 9152
-#define BUFSIZE    4096
+#define BUFSIZE    512
+
+DWORD WINAPI WorkerThread(LPVOID arg);
 
 using namespace std;
 
@@ -66,32 +68,7 @@ bool checkCollision(SDL_Rect a, SDL_Rect b)
     return true;
 }
 
-// 소켓 함수 오류 출력 후 종료
-void err_quit(char* msg)
-{
-    LPVOID lpMsgBuf;
-    FormatMessage(
-        FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
-        NULL, WSAGetLastError(),
-        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-        (LPTSTR)&lpMsgBuf, 0, NULL);
-    MessageBox(NULL, (LPCTSTR)lpMsgBuf, msg, MB_ICONERROR);
-    LocalFree(lpMsgBuf);
-    exit(1);
-}
 
-// 소켓 함수 오류 출력
-void err_display(char* msg)
-{
-    LPVOID lpMsgBuf;
-    FormatMessage(
-        FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
-        NULL, WSAGetLastError(),
-        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-        (LPTSTR)&lpMsgBuf, 0, NULL);
-    printf("[%s] %s", msg, (char*)lpMsgBuf);
-    LocalFree(lpMsgBuf);
-}
 
 // 클라이언트와 데이터 통신
 DWORD WINAPI CommunicateThread(LPVOID arg) {
@@ -106,14 +83,50 @@ DWORD WINAPI CommunicateThread(LPVOID arg) {
     addrlen = sizeof(clientaddr);
     getpeername(client_sock, (SOCKADDR*)&clientaddr, &addrlen);
 
+    printf("communicate thread create success \n");
+
+    int key = 0;
+
+    while (1) {
+        retval = recv(client_sock, buf, BUFSIZE, 0);
+        buf[retval] = '\0';
+        key = buf[0];
+        if (key == 1) {
+            printf("player up \n");
+            break;
+        }
+        else if (key == 2) {
+            printf("player down \n");
+            break;
+        }
+        else if (key == 3){
+            printf("player right \n");
+            break;
+        }
+        else if (key == 4) {
+            printf("player left \n");
+            break;
+        }
+        else if (key == 5) {
+            printf("player shoot \n");
+            break;
+        }
+
+    }
+    //strcpy(buf, "works fine \n");
+    retval = send(client_sock, buf, retval, 0); //retval
     HANDLE wThread;
     wThread = CreateThread(NULL, 0, WorkerThread, NULL, 0, NULL); //creates worker thread, gives null for now
+    
+    //send data to worker thread
 
     //wait()
 
-    //send data
+    //send data to client
 
     //closesocket()
+
+    return 1;
 }
 
 
@@ -121,7 +134,8 @@ DWORD WINAPI CommunicateThread(LPVOID arg) {
 //game logic
 DWORD WINAPI WorkerThread(LPVOID arg)
 {
-    //recv data
+    printf("worker thread create success");
+    //recv data from communicate thread
 
     //handle logic
 
@@ -131,7 +145,7 @@ DWORD WINAPI WorkerThread(LPVOID arg)
     
     //signal
 
-
+    return 1;
 }
 
 
@@ -145,7 +159,7 @@ int main(int argc, char* argv[]) {
 
     // socket()
     SOCKET listen_sock = socket(AF_INET, SOCK_STREAM, 0);
-    if (listen_sock == INVALID_SOCKET) err_quit("socket()");
+    //if (listen_sock == INVALID_SOCKET) err_quit("socket()");
 
     // bind()
     SOCKADDR_IN serveraddr;
@@ -154,11 +168,11 @@ int main(int argc, char* argv[]) {
     serveraddr.sin_addr.s_addr = htonl(INADDR_ANY);
     serveraddr.sin_port = htons(SERVERPORT);
     retval = bind(listen_sock, (SOCKADDR*)&serveraddr, sizeof(serveraddr));
-    if (retval == SOCKET_ERROR) err_quit("bind()");
+    //if (retval == SOCKET_ERROR) err_quit("bind()");
 
     // listen()
     retval = listen(listen_sock, SOMAXCONN);
-    if (retval == SOCKET_ERROR) err_quit("listen()");
+    //if (retval == SOCKET_ERROR) err_quit("listen()");
 
     // 데이터 통신에 사용할 변수
     SOCKET client_sock;
@@ -171,7 +185,7 @@ int main(int argc, char* argv[]) {
         addrlen = sizeof(clientaddr);
         client_sock = accept(listen_sock, (SOCKADDR*)&clientaddr, &addrlen);
         if (client_sock == INVALID_SOCKET) {
-            err_display("accept()");
+            //err_display("accept()");
             break;
         }
 

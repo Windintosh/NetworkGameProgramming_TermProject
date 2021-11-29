@@ -21,6 +21,8 @@ public:
 		b.move(+1);
 		return b;
 	}
+	void Fire(int opt);
+
 };
 
 #endif
