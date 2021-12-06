@@ -178,8 +178,8 @@ int main(int argc, char* args[])
 					continue;
 				} 
 				else if (key == 6) {
-					printf("player quit \n");
-					exit(0);
+					printf("player quit success \n");
+					quit = true;
 					break;
 				}//after here
 				break;
@@ -190,6 +190,7 @@ int main(int argc, char* args[])
 			
 			////Update the surface
 			//SDL_UpdateWindowSurface(gWindow);
+			//break;
 		}
 	}
 
