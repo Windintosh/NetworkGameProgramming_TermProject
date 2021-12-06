@@ -142,6 +142,10 @@ int main(int argc, char* args[])
 						printf("player shoot \n");
 						key = 5;
 						break;
+					case SDLK_ESCAPE:
+						printf("player quit \n");
+						key = 6;
+						break;
 					}
 				}
 				buf[0] = key;
@@ -154,7 +158,8 @@ int main(int argc, char* args[])
 				key = buf[0];
 				if (key == 1) {
 					printf("player up success \n");
-					continue;
+					//handle move here
+					continue; //to the start of the loop
 				}
 				else if (key == 2) {
 					printf("player down success \n");
@@ -171,7 +176,12 @@ int main(int argc, char* args[])
 				else if (key == 5) {
 					printf("player shoot success \n");
 					continue;
-				} //after here
+				} 
+				else if (key == 6) {
+					printf("player quit \n");
+					exit(0);
+					break;
+				}//after here
 				break;
 			}
 			

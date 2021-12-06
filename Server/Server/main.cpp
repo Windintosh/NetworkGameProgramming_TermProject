@@ -94,6 +94,7 @@ DWORD WINAPI CommunicateThread(LPVOID arg) {
         key = buf[0];
         if (key == 1) {
             printf("player up \n");
+            //handle move here
             buf[0] = key;
             retval = send(client_sock, buf, retval, 0);
             continue;
@@ -122,14 +123,15 @@ DWORD WINAPI CommunicateThread(LPVOID arg) {
             retval = send(client_sock, buf, retval, 0);
             continue;
         }
-        //buf[0] = key;
-        //retval = send(client_sock, buf, retval, 0);
+        else if (key == 6) {
+            printf("player quit \n");
+            buf[0] = key;
+            retval = send(client_sock, buf, retval, 0);
+            continue;
+        }
+        break;
     }
-    //strcpy(buf, "works fine \n");
-    /*
-    buf[0] = key;
-    retval = send(client_sock, buf, retval, 0); //retval
-    */
+
     //HANDLE wThread;
     //wThread = CreateThread(NULL, 0, WorkerThread, NULL, 0, NULL); //creates worker thread, gives null for now
     
