@@ -115,8 +115,8 @@ DWORD WINAPI CommunicateThread(LPVOID arg) {
     }
     //strcpy(buf, "works fine \n");
     retval = send(client_sock, buf, retval, 0); //retval
-    HANDLE wThread;
-    wThread = CreateThread(NULL, 0, WorkerThread, NULL, 0, NULL); //creates worker thread, gives null for now
+    //HANDLE wThread;
+    //wThread = CreateThread(NULL, 0, WorkerThread, NULL, 0, NULL); //creates worker thread, gives null for now
     
     //send data to worker thread
 
