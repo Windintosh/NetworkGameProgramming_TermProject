@@ -88,33 +88,48 @@ DWORD WINAPI CommunicateThread(LPVOID arg) {
     int key = 0;
 
     while (1) {
+        key = 0;
         retval = recv(client_sock, buf, BUFSIZE, 0);
         buf[retval] = '\0';
         key = buf[0];
         if (key == 1) {
             printf("player up \n");
-            break;
+            buf[0] = key;
+            retval = send(client_sock, buf, retval, 0);
+            continue;
         }
         else if (key == 2) {
             printf("player down \n");
-            break;
+            buf[0] = key;
+            retval = send(client_sock, buf, retval, 0);
+            continue;
         }
         else if (key == 3){
             printf("player right \n");
-            break;
+            buf[0] = key;
+            retval = send(client_sock, buf, retval, 0);
+            continue;
         }
         else if (key == 4) {
             printf("player left \n");
-            break;
+            buf[0] = key;
+            retval = send(client_sock, buf, retval, 0);
+            continue;
         }
         else if (key == 5) {
             printf("player shoot \n");
-            break;
+            buf[0] = key;
+            retval = send(client_sock, buf, retval, 0);
+            continue;
         }
-
+        //buf[0] = key;
+        //retval = send(client_sock, buf, retval, 0);
     }
     //strcpy(buf, "works fine \n");
+    /*
+    buf[0] = key;
     retval = send(client_sock, buf, retval, 0); //retval
+    */
     //HANDLE wThread;
     //wThread = CreateThread(NULL, 0, WorkerThread, NULL, 0, NULL); //creates worker thread, gives null for now
     
@@ -125,8 +140,10 @@ DWORD WINAPI CommunicateThread(LPVOID arg) {
     //send data to client
 
     //closesocket()
-
-    return 1;
+    closesocket(client_sock);
+    printf("[TCP 서버] 클라이언트 종료: IP 주소=%s, 포트 번호=%d\n",
+        inet_ntoa(clientaddr.sin_addr), ntohs(clientaddr.sin_port));
+    return 0;
 }
 
 

@@ -89,7 +89,7 @@ int main(int argc, char* args[])
 	serveraddr.sin_addr.s_addr = inet_addr(SERVERIP);
 	serveraddr.sin_port = htons(SERVERPORT);
 	retval = connect(sock, (SOCKADDR*)&serveraddr, sizeof(serveraddr));
-	printf("connect success");
+	printf("connect success \n");
 
 	// 데이터 통신에 사용할 변수
 	char buf[BUFSIZE + 1];
@@ -106,6 +106,7 @@ int main(int argc, char* args[])
 		//While application is running
 		while (!quit)
 		{
+			key = 0;
 			//Handle events on queue
 			while (SDL_PollEvent(&e) != 0)
 			{
@@ -144,14 +145,36 @@ int main(int argc, char* args[])
 					}
 				}
 				buf[0] = key;
-
+				key = 0;
 				retval = send(sock, buf, strlen(buf), 0);
+				// before
+				key = 0;
+
+				retval = recvn(sock, buf, retval, 0);
+				key = buf[0];
+				if (key == 1) {
+					printf("player up success \n");
+					continue;
+				}
+				else if (key == 2) {
+					printf("player down success \n");
+					continue;
+				}
+				else if (key == 3) {
+					printf("player right success \n");
+					continue;
+				}
+				else if (key == 4) {
+					printf("player left success \n");
+					continue;
+				}
+				else if (key == 5) {
+					printf("player shoot success \n");
+					continue;
+				} //after here
 				break;
 			}
-
-			retval = recvn(sock, buf, retval, 0);
-			if (retval != SOCKET_ERROR)
-				printf("works fine \n");
+			
 			////Apply the image
 			//SDL_BlitSurface(gXOut, NULL, gScreenSurface, NULL);
 			
